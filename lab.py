@@ -54,11 +54,14 @@ def drawMap(screen):
     for j in range(0,len(map_in_memory)):
         for i in range(0,len(map_in_memory[0])):
             if map_in_memory[j][i] in space_char:
-                screen.addstr(j, i, ' ')
+                if (j,i) in map_fog_of_war:
+                    screen.addstr(j, i, ' ')
             if map_in_memory[j][i] in start_char:
-                screen.addstr(j, i, '▫')
+                if (j,i) in map_fog_of_war:
+                    screen.addstr(j, i, '▫')
             if map_in_memory[j][i] in wall_char:
-                screen.addstr(j, i, '⦁')
+                if (j,i) in map_fog_of_war:
+                    screen.addstr(j, i, '⦁')
 
 # Controls the movement of Rezso, the 'R' character on screen
 def movement(screen):
