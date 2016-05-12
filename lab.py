@@ -24,6 +24,10 @@ def keyDropM():
     key_drop_coordinates = (0, 0)
     key_drop_coordinates = key_drop[0]
 
+def touchobject(object_a, object_b):
+    pass
+
+
 # Draws Rezso on the screen
 def drawRezso(screen):
     screen.addstr(R_pos[0], R_pos[1], 'R')
@@ -112,7 +116,7 @@ def drawMap(screen):
 
             # We draw the key not from the map
             #if map_in_memory[j][i] in key_drop_coordinates:
-            if (j,i) in map_fog_of_war:
+            if key_drop_coordinates in map_fog_of_war:
                 screen.addstr(key_drop_coordinates[0], key_drop_coordinates[1], 'k')
             else:
                 pass
