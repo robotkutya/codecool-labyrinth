@@ -7,11 +7,12 @@ from curses import wrapper
 from copy import deepcopy
 # Sets up
 def initialize(screen):
-    global q, dims, R_pos
+    global q, dims, R_pos, map_fog_of_war
     # Sets global variables
     R_pos = [0,0]
     q = -1
     dims = screen.getmaxyx()
+    map_fog_of_war = set()
     # Makes the cursor not blink
     curses.curs_set(False)
 
@@ -25,6 +26,7 @@ def readMap(screen):
     # Set up variables
     map_dim = [0,0]
     map_in_memory = []
+    map_fog_of_war = set()
     wall_coordinates = set()
     wall_char = {'#'}
     start_char = {'S'}
@@ -61,9 +63,19 @@ def drawMap(screen):
 # Controls the movement of Rezso, the 'R' character on screen
 def movement(screen):
     # Get global variables
-    global R_pos, R_pos_previous, dims, q
+    global R_pos, R_pos_previous, dims, q, map_fog_of_war
     # Save Rezso's position
     R_pos_previous = deepcopy(R_pos)
+    # Add coordinates to  map_fog_of_war set
+    map_fog_of_war.add((R_pos[0]-1, R_pos[1]-1))
+    map_fog_of_war.add((R_pos[0]-1, R_pos[1]+0))
+    map_fog_of_war.add((R_pos[0]-1, R_pos[1]+1))
+    map_fog_of_war.add((R_pos[0]+0, R_pos[1]-1))
+    map_fog_of_war.add((R_pos[0]+0, R_pos[1]+0))
+    map_fog_of_war.add((R_pos[0]+0, R_pos[1]+1))
+    map_fog_of_war.add((R_pos[0]+1, R_pos[1]-1))
+    map_fog_of_war.add((R_pos[0]+1, R_pos[1]+0))
+    map_fog_of_war.add((R_pos[0]+1, R_pos[1]+1))
     # Get user input
     q = screen.getch()
     # Movement itself
