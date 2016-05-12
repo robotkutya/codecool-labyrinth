@@ -18,19 +18,26 @@ def initialize(screen):
 
 # Draws Rezso on the screen
 def drawRezso(screen):
-    screen.addstr(R_pos[0], R_pos[1], 'R', curses.A_BOLD)
+    screen.addstr(R_pos[0], R_pos[1], 'R')
 
 # Reads and interprets the map file into memory
 def readMap(screen):
-    global wall_coordinates, wall_char, start_char, space_char, R_pos, map_in_memory, map_dim
+    global map_dim, map_in_memory, R_pos, wall_coordinates, space_coordinates, key_coordinates, win_coordinates, start_char, wall_char_ver, wall_char_hor, space_char, key_char, win_char
+
     # Set up variables
     map_dim = [0,0]
     map_in_memory = []
     map_fog_of_war = set()
-    wall_coordinates = set()
-    wall_char = {'#'}
     start_char = {'S'}
+    wall_char_ver = {'8'}
+    wall_char_hor = {'a'}
     space_char = {' '}
+    key_char = {'K'}
+    win_char = {'W'}
+    wall_coordinates = set()
+    space_coordinates = set()
+    key_coordinates = set()
+    win_coordinates = set()
     # Read the map file lines into a list
     f = open('map', 'r')
     map_in_memory = f.readlines()
@@ -43,26 +50,34 @@ def readMap(screen):
         for i in range(0,len(map_in_memory[0])):
             if map_in_memory[j][i] in start_char:
                 R_pos = [j,i]
-            if map_in_memory[j][i] in wall_char:
-                #this should follow the curses coordinate system
-                wall_coordinates.add((j,i))
-
-## need to make coordinates like in curses
+            if map_in_memory[j][i] in space_char:
+                space_coordinates.add((j, i))
+            if map_in_memory[j][i] in key_char:
+                key_coordinates.add((j, i))
+                wall_coordinates.add((j, i))
+            if map_in_memory[j][i] in win_char:
+                win_coordinates.add((j, i))
+            if map_in_memory[j][i] in wall_char_hor:
+                wall_coordinates.add((j, i))
+            if map_in_memory[j][i] in wall_char_ver:
+                wall_coordinates.add((j, i))
 
 # Draws the map (walls, exit, etc) on the screen, we can tell it how
 def drawMap(screen):
     for j in range(0,len(map_in_memory)):
         for i in range(0,len(map_in_memory[0])):
-            if map_in_memory[j][i] in space_char:
+            if map_in_memory[j][i] in space_char or key_char:
                 if (j,i) in map_fog_of_war:
                     screen.addstr(j, i, ' ')
             if map_in_memory[j][i] in start_char:
                 if (j,i) in map_fog_of_war:
                     screen.addstr(j, i, '▫')
-            if map_in_memory[j][i] in wall_char:
+            if map_in_memory[j][i] in wall_char_hor:
                 if (j,i) in map_fog_of_war:
-                    screen.addstr(j, i, '⦁')
-
+                    screen.addstr(j, i, 'a')
+            if map_in_memory[j][i] in wall_char_ver:
+                if (j,i) in map_fog_of_war:
+                    screen.addstr(j, i, '8')
 # Controls the movement of Rezso, the 'R' character on screen
 def movement(screen):
     # Get global variables
