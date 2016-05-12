@@ -4,7 +4,7 @@
 # Import shit
 import curses
 from curses import wrapper
-
+from copy import deepcopy
 # Sets up
 def initialize(screen):
     global q, dims, R_pos
@@ -21,36 +21,49 @@ def drawRezso(screen):
 
 # Reads and interprets the map file into memory
 def readMap(screen):
-    global wall_coordinates, R_pos
+    global wall_coordinates, wall_char, start_char, space_char, R_pos, map_in_memory, map_dim
+    # Set up variables
+    map_dim = [0,0]
+    map_in_memory = []
     wall_coordinates = set()
     wall_char = {'#'}
-    start_char = {'S','s'}
-    a = open('map', 'r')
-    f = a.readlines()
-    for j in range(0,len(f)):
-        for i in range(0,len(f[0])):
-            if f[j][i] in start_char:
+    start_char = {'S'}
+    space_char = {' '}
+    # Read the map file lines into a list
+    f = open('map', 'r')
+    map_in_memory = f.readlines()
+    f.close()
+    # Save map dimensions
+    map_dim[0] = len(map_in_memory)
+    map_dim[1] = len(map_in_memory[0])
+    # Make a nested list representation of the map for each character
+    for j in range(0,len(map_in_memory)):
+        for i in range(0,len(map_in_memory[0])):
+            if map_in_memory[j][i] in start_char:
                 R_pos = [j,i]
-            if f[j][i] in wall_char:
+            if map_in_memory[j][i] in wall_char:
                 #this should follow the curses coordinate system
                 wall_coordinates.add((j,i))
-            else:
-                pass
 
 ## need to make coordinates like in curses
 
-# Draws the map (walls, exit, etc) on the screen
+# Draws the map (walls, exit, etc) on the screen, we can tell it how
 def drawMap(screen):
-    a = open('map', 'r')
-    f = a.read()
-    screen.addstr(0, 0, f)
+    for j in range(0,len(map_in_memory)):
+        for i in range(0,len(map_in_memory[0])):
+            if map_in_memory[j][i] in space_char:
+                screen.addstr(j, i, ' ')
+            if map_in_memory[j][i] in start_char:
+                screen.addstr(j, i, '▫')
+            if map_in_memory[j][i] in wall_char:
+                screen.addstr(j, i, '⦁')
 
 # Controls the movement of Rezso, the 'R' character on screen
 def movement(screen):
     # Get global variables
     global R_pos, R_pos_previous, dims, q
     # Save Rezso's position
-    R_pos_previous = R_pos
+    R_pos_previous = deepcopy(R_pos)
     # Get user input
     q = screen.getch()
     # Movement itself
@@ -69,8 +82,7 @@ def movement(screen):
 def checker(screen):
     global R_pos, R_pos_previous
     if (R_pos[0], R_pos[1]) in wall_coordinates:
-        screen.addstr(16, 0, 'Wall')
-        R_pos = [1,1]
+        R_pos = deepcopy(R_pos_previous)
     else:
         pass
 
@@ -91,8 +103,8 @@ def main(screen):
         drawMap(screen)
         drawRezso(screen)
         checker(screen)
-        screen.addstr(15,0,str(R_pos[0]))
-        screen.addstr(15,5,str(R_pos[1]))
+#        screen.addstr(15,0,str(R_pos[0]))
+#        screen.addstr(15,5,str(R_pos[1]))
         movement(screen)
         checker(screen)
         screen.refresh()
