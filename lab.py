@@ -102,6 +102,25 @@ def checker(screen):
 def menu(screen):
     pass
 
+# Checks if terminal is big enough for map
+def testpage():
+    f = open('map', 'r')
+    map_in_memory = f.readlines()
+    f.close()
+    # Save map dimensions
+    map_dim = [0,0]
+    map_dim[0] = len(map_in_memory)
+    map_dim[1] = len(map_in_memory[0])
+    openpage = curses.initscr()
+    maxy, maxx = openpage.getmaxyx()
+    if map_dim[0] > maxy or map_dim[1] > maxx:
+        print("Please make the terminal at least " + str(map_dim[1]) +
+        " characters wide and " + str(map_dim[0]) + " characters long")
+        curses.endwin()
+        quit()
+    else:
+        pass
+
 # Define the main() function for the wrapper
 def main(screen):
     # We need to pass global variables to the wrapper
@@ -123,5 +142,7 @@ def main(screen):
     # End when 'q' is pressed
     curses.endwin()
 
+
 # Use the wrapper to avoid bugs
+testpage()
 wrapper(main)
